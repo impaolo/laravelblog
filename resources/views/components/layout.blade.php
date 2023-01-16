@@ -16,8 +16,20 @@
                 </a>
             </div>
 
-            <div class="mt-8 md:mt-0">
-                <a href="/" class="text-xs font-bold uppercase">Home Page</a>
+            <div class="mt-8 md:mt-0 flex items-center">
+                @guest
+                <a href="/register" class="text-sm font-bold uppercase">Register</a>
+                <a href="/login" class="ml-6 text-sm font-bold uppercase">Login</a>
+                @else
+                <span>Welcome, {{ auth()->user()->name }}</span>
+                <form method="POST" action="/logout" class="text-sm font-semibold text-red-500 ml-6">
+                    @csrf
+
+                    <button type="submit">Log Out</button>
+
+                </form>
+                    
+                @endguest
 
                 <a href="#" class="bg-blue-500 ml-3 rounded-full text-xs font-semibold text-white uppercase py-3 px-5">
                     Subscribe for Updates
@@ -26,6 +38,8 @@
         </nav>
 
              {{ $slot }}
+
+             
 
         <footer class="bg-gray-100 border border-black border-opacity-5 rounded-xl text-center py-16 px-10 mt-16">
             <img src="/images/lary-newsletter-icon.svg" alt="" class="mx-auto -mb-6" style="width: 145px;">
@@ -54,5 +68,6 @@
                 </div>
             </div>
         </footer>
+                <x-flash/>
     </section>
 </body>
