@@ -1,10 +1,10 @@
-{{-- @props(['title', 'post','category','body']) --}}
+{{-- @props(['title', 'post','category','body']) alternative ways--}}
 @props(['post'])
 <article >
 
 <div class="py-6 px-5 lg:flex">
     <div class="flex-1 lg:mr-8">
-        <img src="/images/illustration-1.png" alt="Blog Post illustration" class="rounded-xl">
+        <img src="/images/illustration-3.png" alt="Blog Post illustration" class="rounded-xl">
     </div>
 
     <div class="flex-1 flex flex-col justify-between">
@@ -14,7 +14,7 @@
                    class="px-3 py-1 border border-blue-300 rounded-full text-blue-300 text-xs uppercase font-semibold"
                    style="font-size: 10px">{{ $post['category']['name'] }}</a> --}}
 
-                <a href="categories/{{ $post->category->slug }}"
+                <a href="/?category={{ $post->category->slug }}"
                    class="px-3 py-1 border border-red-300 rounded-full text-red-300 text-xs uppercase font-semibold"
                    style="font-size: 10px">{{ $post->category->name }}</a>
             </div>
@@ -50,7 +50,9 @@
                 <img src="/images/lary-avatar.svg" alt="Lary avatar">
                 <div class="ml-3">
                     {{-- <h5 class="font-bold">{{ $post['author']['name'] }}</h5> --}}
-                    <h6>{{ $post->author->name }}s</h6>
+                    <h6>
+                        <a href="/?author=/{{ $post->author->username }}}">{{ $post->author ->name }}</a>
+                    </h6>
                 </div>
             </div>
 

@@ -5,15 +5,17 @@
             <article class="max-w-4xl mx-auto lg:grid lg:grid-cols-12 gap-x-10">
                 <div class="col-span-4 lg:text-center lg:pt-14 mb-10">
                     <img src="/images/illustration-1.png" alt="" class="rounded-xl">
-                   
+            
                     <p class="mt-4 block text-gray-400 text-xs">
                         Published <time>{{ $post->created_at->diffForHumans(); }}</time>
                     </p>
-                    
+    
                     <div class="flex items-center lg:justify-center text-sm mt-4">
                         <img src="/images/lary-avatar.svg" alt="Lary avatar">
                         <div class="ml-3 text-left">
-                            <h5 class="font-bold">{{ $post->author ->name }}</h5>
+                            <h5 class="font-bold">
+                                <a href="/?author=/{{ $post->author->username }}}">{{ $post->author ->name }}</a>
+                            </h5>
                             
                         </div>
                     </div>
@@ -54,6 +56,50 @@
                         {{ $post->body }}
                     </div>
                 </div>
+                <section class="col-span-8 col-start-5 mt-10 space-y-6">
+
+                    @auth
+                        
+                    <form method="POST" action="/posts/{{ $post->slug }}/comments" class="border border-gray-200 p-6 rounded-xl">
+                        @csrf
+                        <header class="flex items-center">
+                            <img src="https://i.pravatar.cc/60?u={{ auth()->id() }}" alt="" width="40" height="40" class="rounded-full">
+
+                            <h1 class="ml-3">
+                                <a href="/login">Login to Leave a comment</a>
+                                </h1>
+                        </header>
+                        
+                        <div class="mb-4">
+                            <label class="block text-gray-500 text-sm font-bold mb-4 mt-2" for="body">
+                                Comment</label>
+                            <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-500 leading-tight focus:outline-none focus:shadow-outline"
+                            id="body" rows="4" name="body" placeholder="body..." required>{{ old("body") }}</textarea>
+            
+                            @error("body")
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="mb-4 flex justify-end">
+                            <button type="submit" class="bg-blue-500 text-white uppercase font-semibold text-xs py-2 px-10 rounded-2xl hover:bg-blue-600">Post</button>
+                        </div>
+
+
+                    </form>
+                    @endauth
+
+
+                    @foreach ($post->comments as $comment )
+
+                    <x-post-comment :comment="$comment" />
+                        
+                    @endforeach
+  
+                    
+                    
+
+                </section>
             </article>
         </main>
     </section>

@@ -3,8 +3,10 @@ use App\Models\Post;
 use App\Models\User;
 use App\Models\Category;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\PostCommentsController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\SessionsController;
+use App\Http\Controllers\AdminPostController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,32 +23,16 @@ use Illuminate\Support\Facades\Route;
 Route::get('/',[PostController::class,'index'])->name("home");
 
 Route::get('posts/{post:slug}', [PostController::class,'show']);
+Route::post('posts/{post:slug}/comments', [PostCommentsController::class,'store']);
 
 
-Route::get('categories/{category:slug}', function (Category $category) {
-    $post = Post::all();
-    return view('posts.post',[
-        'posts' => $category ->posts,
-        'post' => $post,
-        'currentCategory' => $category,
-        'categories' => Category::all()
-    ]);
-});
+Route::get('admin/posts', [AdminPostController::class,'index'])->middleware('admins');
+Route::get('admin/posts/create', [AdminPostController::class,'create'])->middleware('admins');
+Route::post('admin/posts', [AdminPostController::class,'store'])->middleware('admins');
 
-Route::get('author/{author:username}', function (User $author) {
-    $post = Post::all();
-    return view('posts.post',[
-        'posts' => $author ->posts,
-        'post' => $post,
-        'categories' => Category::all()
-    ]);
-});
-
-
-
-Route::get('admin/posts/create', [PostController::class,'create'])->middleware('admins');
-Route::post('admin/posts', [PostController::class,'store'])->middleware('admins');
-
+Route::get('admin/posts/{post}/edit', [AdminPostController::class,'edit']);
+Route::put('admin/posts/{post}', [AdminPostController::class,'update']);
+Route::delete('admin/posts/{post}', [AdminPostController::class,'destroy']);
 
 
 
@@ -60,7 +46,31 @@ Route::post('login',[SessionsController::class,'store'])->middleware('guest');
 Route::post('logout',[SessionsController::class,'destroy'])->middleware('auth');
 
 
+Route::post('newsletter', function () {
+    request()->validate(['email'=>'required|email']);
 
+       $mailchimp = new MailchimpMarketing\ApiClient();
+
+       $mailchimp->setConfig([
+       'apiKey' => config('services.mailchimp.key'),
+       'server' => 'us21'
+       ]);
+       $list_id = "7cec9841a2";
+try {
+       $response = $mailchimp->lists->addListMember($list_id, [
+           "email_address" => request("email"),
+           "status" => "subscribed"
+         ]);
+   } catch(\exception $e){
+       throw \Illuminate\Validation\ValidationException::withMessages([
+           'email' => 'This email could not be added'
+       ]);
+
+   }
+       
+       return redirect('/')->with('success','You are now subscribed to our newsletters!');
+
+});
 
 
 
