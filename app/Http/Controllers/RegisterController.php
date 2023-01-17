@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 use App\Models\User;
-use App\Http\Requests\RegistrationController;
 use Illuminate\Http\Request;
 use App\Http\Middleware\Authenticate;
 
@@ -13,13 +12,17 @@ class RegisterController extends Controller
         return view('register.create');
     }
 
-    public function store(RegistrationController $request)
+    public function store()
     {
-        $data = request()->all();
+       $attributes = request()->validate([
+            'name' => 'required|min:2|max:255',
+            'username' => 'required|min:3|max:255|unique:users,username',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => 'required|min:7|max:255',
+        ]);
+        $attributes['password']=bcrypt($attributes['password']);
 
-        $data['password']=bcrypt($data['password']);
-
-        $user = User::create($data);
+        $user = User::create($attributes);
 
         // login user
 
